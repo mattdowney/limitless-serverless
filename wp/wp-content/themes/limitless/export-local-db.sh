@@ -6,13 +6,12 @@
 echo "🗄️  Exporting Local WordPress Database..."
 echo "============================================"
 
-# Common LocalWP database settings
-# You may need to adjust these based on your LocalWP setup
+# LocalWP database settings from limitless.local
 LOCAL_HOST="localhost"
-LOCAL_PORT="10003"  # Default LocalWP MySQL port
+LOCAL_SOCKET="/Users/mattdowney/Library/Application Support/Local/run/n9YrxsnhN/mysql/mysqld.sock"
 LOCAL_USER="root"
-LOCAL_PASS="root"   # Default LocalWP MySQL password
-LOCAL_DB="local"    # Your local database name - update this!
+LOCAL_PASS="root"
+LOCAL_DB="local"
 
 # Create filename with timestamp
 TIMESTAMP=$(date +"%Y%m%d_%H%M%S")
@@ -25,17 +24,20 @@ echo "   Database: $LOCAL_DB"
 echo "   Export file: $EXPORT_FILE"
 echo ""
 
-# Check if mysqldump is available
-if ! command -v mysqldump &> /dev/null; then
-    echo "❌ Error: mysqldump not found. Please install MySQL client tools."
+# Use LocalWP's MySQL tools
+MYSQLDUMP_PATH="/Applications/Local.app/Contents/Resources/extraResources/lightning-services/mysql-8.0.35+4/bin/darwin-arm64/bin/mysqldump"
+
+# Check if LocalWP mysqldump is available
+if [ ! -f "$MYSQLDUMP_PATH" ]; then
+    echo "❌ Error: LocalWP mysqldump not found at $MYSQLDUMP_PATH"
+    echo "   Make sure LocalWP is installed and running."
     exit 1
 fi
 
 # Export the database
 echo "⏳ Starting export..."
-mysqldump \
-    -h $LOCAL_HOST \
-    -P $LOCAL_PORT \
+"$MYSQLDUMP_PATH" \
+    --socket="$LOCAL_SOCKET" \
     -u $LOCAL_USER \
     -p$LOCAL_PASS \
     --single-transaction \

@@ -7,7 +7,7 @@ echo "🚀 Syncing Limitless Theme to ServerlessWP..."
 echo "============================================="
 
 REPO_URL="https://github.com/mattdowney/limitless-serverless.git"
-REPO_DIR="limitless-serverless"
+REPO_DIR="/tmp/limitless-serverless-deploy"
 THEME_PATH="wp/wp-content/themes/limitless"
 
 echo "📂 Repository: $REPO_URL"
@@ -51,6 +51,7 @@ rsync -av \
     --exclude='.git*' \
     --exclude='node_modules/' \
     --exclude='limitless-serverless/' \
+    --exclude='serverlesswp/' \
     --exclude='*.log' \
     --exclude='.DS_Store' \
     --exclude='wordpress_export_*.sql' \

@@ -112,20 +112,38 @@ get_header(); ?>
     $offset_start = 1;
     $offset = ($current_page - 1) * $per_page + $offset_start;
 
+    // Modified query for TiDB compatibility - removed offset, using pagination differently
     $post_list = new WP_Query([
         'posts_per_page' => $per_page,
         'paged' => $current_page,
-        'offset' => $offset,
-        'orderby' => 'date',
+        'orderby' => 'date', 
         'order' => 'DESC',
+        'post_status' => 'publish',
+        'post_type' => 'post'
     ]);
+    
+    // Skip the first post manually if we're on page 1 (since it's shown as featured)
+    if ($current_page == 1) {
+        $skip_first = true;
+        $posts_to_show = $per_page;
+    } else {
+        $skip_first = false;
+        $posts_to_show = $per_page;
+    }
 
     $total_rows = max(0, $post_list->found_posts - $offset_start);
     $total_pages = ceil($total_rows / $per_page);
 
     if ($post_list->have_posts()):
+        $post_count = 0;
         while ($post_list->have_posts()):
-            $post_list->the_post(); ?>
+            $post_list->the_post(); 
+            $post_count++;
+            
+            // Skip the first post on page 1 (it's already shown as featured)
+            if ($current_page == 1 && $post_count == 1) {
+                continue;
+            } ?>
         <article <?php post_class('mb-5'); ?>>
             <a href="<?php the_permalink(); ?>" title="<?php the_title_attribute(); ?>">
                 <div class="blog-archive-post-thumbnail h-[20rem] w-auto bg-black rounded overflow-hidden mb-6">

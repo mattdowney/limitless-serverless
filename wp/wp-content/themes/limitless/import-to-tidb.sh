@@ -40,15 +40,19 @@ echo "   SQL File: $SQL_FILE"
 echo "   File Size: $(ls -lh "$SQL_FILE" | awk '{print $5}')"
 echo ""
 
-# Check if mysql client is available
-if ! command -v mysql &> /dev/null; then
-    echo "❌ Error: mysql client not found. Please install MySQL client tools."
+# Use LocalWP's MySQL client
+MYSQL_PATH="/Applications/Local.app/Contents/Resources/extraResources/lightning-services/mysql-8.0.35+4/bin/darwin-arm64/bin/mysql"
+
+# Check if LocalWP mysql client is available
+if [ ! -f "$MYSQL_PATH" ]; then
+    echo "❌ Error: LocalWP mysql client not found at $MYSQL_PATH"
+    echo "   Make sure LocalWP is installed."
     exit 1
 fi
 
 # Test connection first
 echo "🔗 Testing TiDB connection..."
-mysql \
+"$MYSQL_PATH" \
     --connect-timeout 15 \
     -h $TIDB_HOST \
     -P $TIDB_PORT \
@@ -76,7 +80,7 @@ fi
 
 # Import the database
 echo "⏳ Importing database... (this may take a few minutes)"
-mysql \
+"$MYSQL_PATH" \
     --connect-timeout 15 \
     -h $TIDB_HOST \
     -P $TIDB_PORT \
