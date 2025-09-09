@@ -215,33 +215,3 @@ function limitless_redirect_feeds() {
 }
 // Uncomment the line below if you want to redirect feeds instead of noindexing them
 // add_action('template_redirect', 'limitless_redirect_feeds');
-
-// Serverless optimizations
-function limitless_serverless_optimizations() {
-    // Add cache headers for better CDN performance
-    if (!is_admin() && !is_user_logged_in()) {
-        // Cache static pages for 1 hour
-        if (is_front_page() || is_page()) {
-            header('Cache-Control: public, max-age=3600, s-maxage=3600');
-        }
-        // Cache blog posts for 30 minutes
-        elseif (is_single()) {
-            header('Cache-Control: public, max-age=1800, s-maxage=1800');
-        }
-        // Cache archives for 15 minutes
-        elseif (is_archive() || is_home()) {
-            header('Cache-Control: public, max-age=900, s-maxage=900');
-        }
-    }
-}
-add_action('template_redirect', 'limitless_serverless_optimizations');
-
-// Disable WordPress cron in admin areas when using SQLite+S3 to prevent race conditions
-if (defined('SQLITE_S3_BUCKET')) {
-    function limitless_disable_cron_in_admin() {
-        if (is_admin() || strpos($_SERVER['REQUEST_URI'], 'wp-admin') !== false) {
-            define('DISABLE_WP_CRON', true);
-        }
-    }
-    add_action('init', 'limitless_disable_cron_in_admin', 1);
-}
