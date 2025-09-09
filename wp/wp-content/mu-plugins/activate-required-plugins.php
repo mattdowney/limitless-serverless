@@ -16,7 +16,6 @@ if (!defined('ABSPATH')) {
  */
 function activate_required_plugins() {
     $required_plugins = array(
-        'advanced-custom-fields/acf.php',
         'tidb-compatibility/tidb-compatibility.php'
     );
     
@@ -44,9 +43,9 @@ add_action('init', 'activate_required_plugins', 1);
 function check_required_plugins_notice() {
     $missing_plugins = array();
     
-    // Check if ACF is available
-    if (!class_exists('ACF') && !function_exists('get_field')) {
-        $missing_plugins[] = 'Advanced Custom Fields';
+    // Check if get_field function is available (either from ACF or our replacement)
+    if (!function_exists('get_field')) {
+        $missing_plugins[] = 'Custom Fields Support';
     }
     
     // Check if TiDB compatibility is loaded
